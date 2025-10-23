@@ -43,4 +43,10 @@ return {
       end)
     end,
   },
+  {
+    'vinnymeller/swagger-preview.nvim',
+    cmd = { 'SwaggerPreview', 'SwaggerPreviewStop', 'SwaggerPreviewToggle' },
+    build = 'npm i',
+    config = true,
+  },
 }
