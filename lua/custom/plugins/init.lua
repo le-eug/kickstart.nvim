@@ -49,4 +49,7 @@ return {
     build = 'npm i',
     config = true,
   },
+  {
+    'mfussenegger/nvim-jdtls',
+  },
 }
