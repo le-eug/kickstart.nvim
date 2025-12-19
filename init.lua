@@ -762,6 +762,14 @@ require('lazy').setup({
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+      -- Godot LSP config
+      vim.lsp.config('gdscript', {
+        cmd = { 'nc', '127.0.0.1', '6005' },
+        filetypes = { 'gd', 'gdscript' },
+        capabilities = capabilities,
+      })
+      vim.lsp.enable 'gdscript'
+
       require('mason-lspconfig').setup {
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
         automatic_installation = false,
@@ -991,6 +999,7 @@ require('lazy').setup({
         'query',
         'vim',
         'vimdoc',
+        'gdscript',
       },
       -- Autoinstall languages that are not installed
       auto_install = true,
