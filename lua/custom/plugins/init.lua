@@ -84,4 +84,37 @@ return {
       }
     end,
   },
+  {
+    'iamcco/markdown-preview.nvim',
+    cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
+    build = 'cd app && yarn install',
+    init = function()
+      vim.g.mkdp_filetypes = { 'markdown' }
+    end,
+    ft = { 'markdown' },
+  },
+
+  -- [[DINGO LSP]]
+  {
+    dir = '/Users/eugenebriones/Developer/dingo/editors/nvim',
+    ft = 'dingo',
+    config = function()
+      require('dingo').setup {
+        lsp = {
+          cmd = { '/Users/eugenebriones/Developer/dingo/bin/dingo-lsp' },
+          log_level = 'info',
+        },
+      }
+    end,
+  },
+  {
+    'lervag/vimtex',
+    lazy = false, -- we don't want to lazy load VimTeX
+    -- tag = "v2.15", -- uncomment to pin to a specific release
+    init = function()
+      -- VimTeX configuration goes here, e.g.
+      vim.g.vimtex_view_method = 'zathura'
+      vim.g.vimtex_compiler_method = 'latexmk'
+    end,
+  },
 }

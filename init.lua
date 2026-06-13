@@ -99,11 +99,30 @@ vim.g.have_nerd_font = false
 --  For more options, you can see `:help option-list`
 
 -- Setting indentation
-local indentwidth = 2
-vim.opt.tabstop = indentwidth
-vim.opt.softtabstop = indentwidth
-vim.opt.shiftwidth = indentwidth
-vim.opt.expandtab = true
+local function set_indent(width, use_tabs)
+  vim.opt.tabstop = width
+  vim.opt.softtabstop = width
+  vim.opt.shiftwidth = width
+  vim.opt.expandtab = not use_tabs
+end
+
+-- Default
+set_indent(4, false)
+
+-- Per-filetype overrides
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'c', 'cpp' },
+  callback = function()
+    set_indent(8, true)
+  end,
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'html', 'css', 'markdown' },
+  callback = function()
+    set_indent(2, false)
+  end,
+})
 
 -- Make line numbers default
 -- vim.o.number = true
@@ -163,7 +182,7 @@ vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 vim.o.inccommand = 'split'
 
 -- Show which line your cursor is on
-vim.o.cursorline = true
+vim.o.cursorline = false
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.o.scrolloff = 10
@@ -217,14 +236,21 @@ vim.keymap.set('n', '<leader>fe', function()
   vim.cmd 'Ex'
 end)
 
--- Disable search highlights on <Esc>
-vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
-
 -- Up Down still keeps centered
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
 vim.keymap.set('n', '<C-f>', '<C-f>zz')
 vim.keymap.set('n', '<C-b>', '<C-b>zz')
+
+-- Todo Telescope
+vim.keymap.set('n', '<leader>to', function()
+  vim.cmd 'TodoTelescope'
+end)
+
+-- List of all diagnostics
+vim.keymap.set('n', '<leader>dia', function()
+  vim.cmd 'lua vim.diagnostic.setqflist()'
+end)
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -248,14 +274,20 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- 2 indentation for Markdown files
+-- Idk if this should go here but DINGO
+vim.filetype.add {
+  extension = { dingo = 'dingo' },
+}
+
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'markdown',
-  callback = function()
-    vim.opt_local.shiftwidth = 2
-    vim.opt_local.tabstop = 2
-    vim.opt_local.softtabstop = 2
-    vim.opt_local.expandtab = true
+  pattern = 'dingo',
+  callback = function(args)
+    vim.lsp.start {
+      name = 'dingo-lsp',
+      cmd = { '/Users/eugenebriones/Developer/dingo/bin/dingo-lsp' },
+      root_dir = vim.fs.root(args.buf, { 'go.mod', '.git' }),
+      init_options = { log_level = 'info' },
+    }
   end,
 })
 
@@ -452,7 +484,12 @@ require('lazy').setup({
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
         --   },
         -- },
-        -- pickers = {}
+        pickers = {
+          find_files = {
+            hidden = true,
+            no_ignore = true,
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -940,6 +977,18 @@ require('lazy').setup({
       require('onedark').load()
     end,
   },
+  -- {
+  --   'vague-theme/vague.nvim',
+  --   lazy = false, -- make sure we load this during startup if it is your main colorscheme
+  --   priority = 1000, -- make sure to load this before all the other plugins
+  --   config = function()
+  --     -- NOTE: you do not need to call setup if you don't want to.
+  --     require('vague').setup {
+  --       transparent = false,
+  --     }
+  --     vim.cmd 'colorscheme vague'
+  --   end,
+  -- },
 
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
